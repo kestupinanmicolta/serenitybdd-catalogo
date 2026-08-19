@@ -51,3 +51,5 @@ src/test/
 | catalogo.feature | 12 | CRUD completo de productos |
 | boundary.feature | 8 | Boundary values y edge cases |
 | usuarios.feature | 4 | Gestión de usuarios |
+
+<!-- lastupdate: 2026-08-18 21:18 -->
