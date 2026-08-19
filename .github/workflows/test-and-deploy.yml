@@ -17,8 +17,11 @@ env:
   ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
 
 jobs:
-  test:
+  build-and-deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -28,36 +31,19 @@ jobs:
       - name: Run Tests
         continue-on-error: true
         run: chmod +x gradlew && ./gradlew test
-      - name: Upload report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: serenity-report
-          path: build/reports/serenity/
-          if-no-files-found: ignore
-
-  deploy:
-    needs: test
-    if: always()
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
-        with:
-          name: serenity-report
-          path: public
-      - name: Fallback if no report
+      - name: Prepare report
         if: always()
         run: |
           mkdir -p public
-          if [ ! -f public/index.html ]; then
+          if [ -d build/reports/serenity ] && [ -f build/reports/serenity/index.html ]; then
+            cp -r build/reports/serenity/* public/
+          elif [ -d build/reports/tests/test ] && [ -f build/reports/tests/test/index.html ]; then
+            cp -r build/reports/tests/test/* public/
+          else
             echo '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>SerenityBDD Report</title>' > public/index.html
             echo '<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">' >> public/index.html
             echo '<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:Inter,sans-serif;background:#f1f5f9;color:#1e293b;display:flex;justify-content:center;align-items:center;min-height:100vh}.card{background:white;border-radius:12px;padding:2rem;box-shadow:0 4px 12px rgba(0,0,0,.1);text-align:center;max-width:400px}.card h1{font-size:1.5rem;margin-bottom:.5rem;color:#0f172a}.card p{color:#64748b;margin-bottom:1rem}.btn{display:inline-block;background:#3b82f6;color:white;padding:.6rem 1.5rem;border-radius:8px;text-decoration:none;font-weight:600}</style></head>' >> public/index.html
-            echo '<body><div class="card"><h1>SerenityBDD Catalogo</h1><p>Tests executed successfully.</p>' >> public/index.html
+            echo '<body><div class="card"><h1>SerenityBDD Catalogo</h1><p>Tests executed. Check Actions for details.</p>' >> public/index.html
             echo '<a href="https://github.com/kestupinanmicolta/serenitybdd-catalogo" class="btn">View Source</a></div></body></html>' >> public/index.html
           fi
       - uses: actions/configure-pages@v5
