@@ -1,0 +1,31 @@
+plugins {
+    id 'java'
+    id 'net.serenity-bdd.serenity-gradle-plugin' version '4.2.34'
+}
+
+group = 'com.karen'
+version = '1.0.0'
+
+repositories {
+    mavenCentral()
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+dependencies {
+    testImplementation 'net.serenity-bdd:serenity-core:4.2.34'
+    testImplementation 'net.serenity-bdd:serenity-junit5:4.2.34'
+    testImplementation 'net.serenity-bdd:serenity-cucumber:4.2.34'
+    testImplementation 'net.serenity-bdd:serenity-rest-assured:4.2.34'
+    testRuntimeOnly 'io.cucumber:cucumber-junit-platform-engine:7.22.2'
+    testImplementation 'org.junit.platform:junit-platform-suite:1.11.0'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+test {
+    useJUnitPlatform()
+    finalizedBy aggregate
+}
