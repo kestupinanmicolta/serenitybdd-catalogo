@@ -28,9 +28,9 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
-      - name: Run Tests
+      - name: Run Tests and Generate Serenity Report
         continue-on-error: true
-        run: chmod +x gradlew && ./gradlew test
+        run: chmod +x gradlew && ./gradlew test aggregate
       - name: Prepare report
         if: always()
         run: |
