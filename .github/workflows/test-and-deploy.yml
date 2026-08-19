@@ -11,7 +11,7 @@ permissions:
 
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   test:
@@ -22,81 +22,45 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
-      - run: chmod +x gradlew && ./gradlew test
+      - name: Run Tests
         continue-on-error: true
-      - name: Copy Serenity reports
-        run: |
-          mkdir -p public
-          cp -r build/reports/serenity/* public/ 2>/dev/null || true
-          cp -r build/reports/tests/test/* public/ 2>/dev/null || true
-          if [ ! -f public/index.html ]; then
-            cat > public/index.html << 'HEREDOC'
-            <!DOCTYPE html>
-            <html lang="es">
-            <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-            <title>SerenityBDD Catalogo Report</title>
-            <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-            <style>
-              *{margin:0;padding:0;box-sizing:border-box}
-              body{font-family:'Inter',sans-serif;background:#f1f5f9;color:#1e293b}
-              .header{background:linear-gradient(135deg,#0f172a,#1e3a5f);color:white;padding:3rem 2rem;text-align:center}
-              .header h1{font-size:1.8rem;margin-bottom:.5rem}
-              .header p{color:#60a5fa}
-              .container{max-width:800px;margin:2rem auto;padding:0 1rem}
-              .card{background:white;border-radius:12px;padding:1.5rem;margin-bottom:1rem;box-shadow:0 2px 8px rgba(0,0,0,.08)}
-              .card h2{font-size:1rem;margin-bottom:.75rem;display:flex;align-items:center;gap:.5rem}
-              .card h2 i{color:#8b5cf6}
-              .tags{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1rem}
-              .tag{background:#ede9fe;color:#7c3aed;padding:.25rem .6rem;border-radius:6px;font-size:.75rem;font-weight:600}
-              .features{list-style:none}
-              .features li{padding:.4rem 0;font-size:.85rem;color:#475569;display:flex;align-items:center;gap:.5rem}
-              .features li i{color:#10b981;font-size:.7rem}
-              .btn{display:inline-flex;align-items:center;gap:.5rem;background:#0f172a;color:white;padding:.6rem 1.2rem;border-radius:8px;text-decoration:none;font-weight:600;font-size:.85rem;margin-top:1rem}
-              .footer{text-align:center;padding:1.5rem;font-size:.75rem;color:#94a3b8}
-            </style></head>
-            <body>
-            <div class="header">
-              <h1><i class="fas fa-chalkboard"></i> SerenityBDD Catalogo</h1>
-              <p>QA Testing Project — API Testing with BDD Reports</p>
-            </div>
-            <div class="container">
-              <div class="card">
-                <h2><i class="fas fa-info-circle"></i> Project Overview</h2>
-                <p style="font-size:.85rem;color:#475569;margin-bottom:1rem">API testing with Serenity BDD and Cucumber against JSONPlaceholder. Features auto-generated HTML reports, boundary tests, and negative test cases.</p>
-                <div class="tags">
-                  <span class="tag">Java</span><span class="tag">Serenity</span><span class="tag">Cucumber</span>
-                  <span class="tag">BDD</span><span class="tag">JSONPlaceholder</span>
-                </div>
-              </div>
-              <div class="card">
-                <h2><i class="fas fa-check-circle"></i> Key Features</h2>
-                <ul class="features">
-                  <li><i class="fas fa-check"></i> Auto-generated Serenity HTML reports</li>
-                  <li><i class="fas fa-check"></i> BDD Gherkin scenarios</li>
-                  <li><i class="fas fa-check"></i> Boundary value testing</li>
-                  <li><i class="fas fa-check"></i> Negative test cases</li>
-                  <li><i class="fas fa-check"></i> Step-by-step documentation</li>
-                </ul>
-              </div>
-              <a href="https://github.com/kestupinanmicolta/serenitybdd-catalogo" target="_blank" class="btn"><i class="fab fa-github"></i> View Source Code</a>
-            </div>
-            <div class="footer">© 2026 Karen Paola Estupinan Micolta</div>
-            </body></html>
-            HEREDOC
-          fi
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+        run: chmod +x gradlew && ./gradlew test
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
         with:
-          path: public
+          name: serenity-report
+          path: build/reports/serenity/
+          if-no-files-found: ignore
 
   deploy:
-    if: always()
     needs: test
+    if: always()
     runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: serenity-report
+          path: public
+          if-no-files-found: ignore
+      - name: Fallback if no report
+        if: always()
+        run: |
+          if [ ! -f public/index.html ]; then
+            mkdir -p public
+            cat > public/index.html << 'EOF'
+            <!DOCTYPE html><html><head><meta charset="UTF-8"><title>SerenityBDD Report</title>
+            <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+            <style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Inter',sans-serif;background:#f1f5f9;color:#1e293b;display:flex;justify-content:center;align-items:center;min-height:100vh}.card{background:white;border-radius:12px;padding:2rem;box-shadow:0 4px 12px rgba(0,0,0,.1);text-align:center;max-width:400px}.card h1{font-size:1.5rem;margin-bottom:.5rem;color:#0f172a}.card p{color:#64748b;margin-bottom:1rem}.btn{display:inline-block;background:#3b82f6;color:white;padding:.6rem 1.5rem;border-radius:8px;text-decoration:none;font-weight:600}</style></head>
+            <body><div class="card"><h1>SerenityBDD Catalogo</h1><p>Tests executed. Check GitHub Actions for details.</p><a href="https://github.com/kestupinanmicolta/serenitybdd-catalogo" class="btn">View Source</a></div></body></html>
+            EOF
+          fi
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
       - id: deployment
         uses: actions/deploy-pages@v4
