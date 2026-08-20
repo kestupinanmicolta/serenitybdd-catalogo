@@ -1,10 +1,7 @@
 package com.karen.catalogo.steps;
 
 import com.karen.catalogo.tasks.CatalogoApi;
-import io.cucumber.java.es.Cuando;
-import io.cucumber.java.es.Dado;
-import io.cucumber.java.es.Entonces;
-import io.cucumber.java.es.Y;
+import io.cucumber.java.en.*;
 import net.serenitybdd.annotations.Steps;
 
 import static net.serenitybdd.rest.SerenityRest.restAssuredThat;
@@ -15,78 +12,77 @@ public class CatalogoStepDefinitions {
     @Steps
     CatalogoApi catalogoApi;
 
-    @Dado("que la API base está configurada en {string}")
+    @Given("the API base is configured as {string}")
     public void configurarApi(String baseUrl) {
-        // La URL base ya está configurada en CatalogoApi
     }
 
-    @Dado("que consulto el producto con identificador {int}")
+    @Given("I query product with identifier {int}")
     public void consultarProducto(int productId) {
         catalogoApi.consultarProducto(productId);
     }
 
-    @Dado("que consulto todos los productos")
+    @Given("I query all products")
     public void consultarTodosLosProductos() {
         catalogoApi.consultarTodosLosProductos();
     }
 
-    @Dado("que filtro productos por usuario {int}")
+    @Given("I filter products by user {int}")
     public void filtrarPorUsuario(int userId) {
         catalogoApi.filtrarPorUsuario(userId);
     }
 
-    @Dado("que consulto los comentarios del producto {int}")
+    @Given("I query comments for product {int}")
     public void consultarComentarios(int productId) {
         catalogoApi.consultarComentarios(productId);
     }
 
-    @Cuando("registro un producto con título {string}, descripción {string} y usuario {int}")
+    @When("I register a product with title {string}, description {string} and user {int}")
     public void registrarProducto(String title, String body, int userId) {
         catalogoApi.crearProducto(title, body, userId);
     }
 
-    @Cuando("actualizo el producto {int} con título {string} y descripción {string}")
+    @When("I update product {int} with title {string} and description {string}")
     public void actualizarProducto(int productId, String title, String body) {
         catalogoApi.actualizarProducto(productId, title, body);
     }
 
-    @Cuando("actualizo parcialmente el producto {int} con título {string}")
+    @When("I partially update product {int} with title {string}")
     public void actualizarParcialmente(int productId, String title) {
         catalogoApi.actualizarParcialmente(productId, title);
     }
 
-    @Cuando("elimino el producto {int}")
+    @When("I delete product {int}")
     public void eliminarProducto(int productId) {
         catalogoApi.eliminarProducto(productId);
     }
 
-    @Entonces("la consulta devuelve el producto {int} titulado {string}")
+    @Then("the response returns product {int} titled {string}")
     public void validarProducto(int productId, String title) {
         restAssuredThat(response -> response.statusCode(200)
                 .body("id", equalTo(productId))
                 .body("title", equalTo(title)));
     }
 
-    @Entonces("el producto queda registrado con título {string}")
+    @Then("the product is registered with title {string}")
     public void validarRegistro(String title) {
         restAssuredThat(response -> response.statusCode(201)
                 .body("id", notNullValue())
                 .body("title", equalTo(title)));
     }
 
-    @Entonces("el producto es registrado exitosamente")
+    @Then("the product is registered successfully")
     public void validarRegistroExitoso() {
         restAssuredThat(response -> response.statusCode(201)
                 .body("id", notNullValue()));
     }
 
-    @Entonces("la respuesta contiene al menos {int} producto")
+    @Then("the response contains at least {int} product")
     public void validarCantidadMinima(int minCount) {
         restAssuredThat(response -> response.statusCode(200)
                 .body("size()", greaterThanOrEqualTo(minCount)));
     }
 
-    @Entonces("cada producto tiene id, título y userId")
+    @Then("each product has id, title and userId")
     public void validarCamposProducto() {
         restAssuredThat(response -> response.statusCode(200)
                 .body("[0].id", notNullValue())
@@ -94,17 +90,17 @@ public class CatalogoStepDefinitions {
                 .body("[0].userId", notNullValue()));
     }
 
-    @Entonces("la consulta返回 código {int}")
+    @Then("the response status code is {int}")
     public void validarCodigo(int statusCode) {
         restAssuredThat(response -> response.statusCode(statusCode));
     }
 
-    @Entonces("la operación retorna código {int}")
+    @Then("the operation returns status code {int}")
     public void validarCodigoOperacion(int statusCode) {
         restAssuredThat(response -> response.statusCode(statusCode));
     }
 
-    @Entonces("la respuesta contiene los campos: id, title, body, userId")
+    @Then("the response contains fields: id, title, body, userId")
     public void validarCamposRespuesta() {
         restAssuredThat(response -> response.statusCode(200)
                 .body("id", notNullValue())
@@ -113,19 +109,19 @@ public class CatalogoStepDefinitions {
                 .body("userId", notNullValue()));
     }
 
-    @Entonces("todos los productos pertenecen al usuario {int}")
+    @Then("all products belong to user {int}")
     public void validarUsuario(int userId) {
         restAssuredThat(response -> response.statusCode(200)
                 .body("userId", everyItem(equalTo(userId))));
     }
 
-    @Entonces("la respuesta contiene al menos {int} comentario")
+    @Then("the response contains at least {int} comment")
     public void validarCantidadComentarios(int minCount) {
         restAssuredThat(response -> response.statusCode(200)
                 .body("size()", greaterThanOrEqualTo(minCount)));
     }
 
-    @Entonces("cada comentario tiene postId, id, name, email y body")
+    @Then("each comment has postId, id, name, email and body")
     public void validarCamposComentario() {
         restAssuredThat(response -> response.statusCode(200)
                 .body("[0].postId", notNullValue())
@@ -135,13 +131,55 @@ public class CatalogoStepDefinitions {
                 .body("[0].body", notNullValue()));
     }
 
-    @Entonces("la respuesta se recibe en menos de {int} segundo(s)")
+    @Then("the response is received in less than {int} seconds")
     public void validarTiempoRespuesta(int segundos) {
         restAssuredThat(response -> response.statusCode(200));
     }
 
-    @Entonces("el Content-Type es {string}")
+    @Then("the Content-Type is {string}")
     public void validarContentType(String contentType) {
         restAssuredThat(response -> response.contentType(contentType));
+    }
+
+    @Given("I query all users")
+    public void consultarTodosLosUsuarios() {
+        catalogoApi.consultarTodosLosUsuarios();
+    }
+
+    @Given("I query user with identifier {int}")
+    public void consultarUsuario(int userId) {
+        catalogoApi.consultarUsuario(userId);
+    }
+
+    @When("I create a user with name {string}, email {string} and username {string}")
+    public void crearUsuario(String name, String email, String username) {
+        catalogoApi.crearUsuario(name, email, username);
+    }
+
+    @Then("the response contains at least {int} user")
+    public void validarMinimoUsuarios(int min) {
+        restAssuredThat(response -> response.statusCode(200)
+                .body("size()", greaterThanOrEqualTo(min)));
+    }
+
+    @Then("each user has id, name and email")
+    public void validarCamposUsuario() {
+        restAssuredThat(response -> response.statusCode(200)
+                .body("[0].id", notNullValue())
+                .body("[0].name", notNullValue())
+                .body("[0].email", notNullValue()));
+    }
+
+    @Then("the user has valid name and email")
+    public void validarUsuarioDetalle() {
+        restAssuredThat(response -> response.statusCode(200)
+                .body("name", notNullValue())
+                .body("email", notNullValue()));
+    }
+
+    @Then("the user is created successfully")
+    public void validarUsuarioCreado() {
+        restAssuredThat(response -> response.statusCode(201)
+                .body("id", notNullValue()));
     }
 }

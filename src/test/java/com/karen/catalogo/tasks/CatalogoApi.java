@@ -81,4 +81,30 @@ public class CatalogoApi {
                 .when()
                 .get("/comments");
     }
+
+    @Step("Consultar todos los usuarios")
+    public void consultarTodosLosUsuarios() {
+        SerenityRest.given()
+                .baseUri(BASE_URL)
+                .when()
+                .get("/users");
+    }
+
+    @Step("Consultar usuario con id {0}")
+    public void consultarUsuario(int userId) {
+        SerenityRest.given()
+                .baseUri(BASE_URL)
+                .when()
+                .get("/users/{id}", userId);
+    }
+
+    @Step("Crear usuario {0}")
+    public void crearUsuario(String name, String email, String username) {
+        SerenityRest.given()
+                .baseUri(BASE_URL)
+                .contentType(ContentType.JSON)
+                .body(Map.of("name", name, "email", email, "username", username))
+                .when()
+                .post("/users");
+    }
 }

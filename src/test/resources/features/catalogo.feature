@@ -1,72 +1,71 @@
-# language: es
-Característica: Administración del catálogo de productos
+Feature: Product catalog management
 
-  Antecedentes:
-    Dado que la API base está configurada en "https://jsonplaceholder.typicode.com"
+  Background:
+    Given the API base is configured as "https://jsonplaceholder.typicode.com"
 
-  # ==================== CONSULTA DE PRODUCTOS ====================
+  # ==================== PRODUCT QUERIES ====================
 
-  Escenario: Consultar el detalle de un producto existente
-    Dado que consulto el producto con identificador 1
-    Entonces la consulta devuelve el producto 1 titulado "sunt aut facere repellat provident occaecati excepturi optio reprehenderit"
+  Scenario: Get an existing product detail
+    Given I query product with identifier 1
+    Then the response returns product 1 titled "sunt aut facere repellat provident occaecati excepturi optio reprehenderit"
 
-  Escenario: Consultar todos los productos disponibles
-    Dado que consulto todos los productos
-    Entonces la respuesta contiene al menos 1 producto
-    Y cada producto tiene id, título y userId
+  Scenario: Get all available products
+    Given I query all products
+    Then the response contains at least 1 product
+    And each product has id, title and userId
 
-  Escenario: Consultar producto con ID inválido
-    Dado que consulto el producto con identificador 99999
-    Entonces la consulta返回 código 404
+  Scenario: Query product with invalid ID
+    Given I query product with identifier 99999
+    Then the response status code is 404
 
-  # ==================== REGISTRO DE PRODUCTOS ====================
+  # ==================== PRODUCT REGISTRATION ====================
 
-  Escenario: Registrar un producto nuevo
-    Cuando registro un producto con título "Audífonos inalámbricos", descripción "Producto para pruebas BDD" y usuario 7
-    Entonces el producto queda registrado con título "Audífonos inalámbricos"
+  Scenario: Register a new product
+    When I register a product with title "Wireless Headphones", description "Testing product" and user 7
+    Then the product is registered with title "Wireless Headphones"
 
-  Escenario: Registrar producto sin título
-    Cuando registro un producto con título "", descripción "Sin título" y usuario 1
-    Entonces el producto es registrado exitosamente
+  Scenario: Register product without title
+    When I register a product with title "", description "No title" and user 1
+    Then the product is registered successfully
 
-  Escenario: Registrar producto con datos mínimos
-    Cuando registro un producto con título "Mínimo", descripción "Test" y usuario 1
-    Entonces el producto queda registrado con título "Mínimo"
+  Scenario: Register product with minimal data
+    When I register a product with title "Minimal", description "Test" and user 1
+    Then the product is registered with title "Minimal"
 
-  # ==================== ACTUALIZACIÓN DE PRODUCTOS ====================
+  # ==================== PRODUCT UPDATE ====================
 
-  Escenario: Actualizar producto existente con PUT
-    Dado que consulto el producto con identificador 1
-    Cuando actualizo el producto 1 con título "Producto Actualizado" y descripción "Contenido actualizado"
-    Entonces el producto queda registrado con título "Producto Actualizado"
+  Scenario: Update product with PUT
+    Given I query product with identifier 1
+    When I update product 1 with title "Updated Product" and description "Updated content"
+    Then the response status code is 200
 
-  Escenario: Actualizar parcialmente con PATCH
-    Dado que consulto el producto con identificador 1
-    Cuando actualizo parcialmente el producto 1 con título "Solo Título"
-    Entonces el producto queda registrado con título "Solo Título"
+  Scenario: Update product partially with PATCH
+    Given I query product with identifier 1
+    When I partially update product 1 with title "Only Title"
+    Then the response status code is 200
 
-  # ==================== ELIMINACIÓN DE PRODUCTOS ====================
+  # ==================== PRODUCT DELETION ====================
 
-  Escenario: Eliminar producto existente
-    Dado que consulto el producto con identificador 1
-    Cuando elimino el producto 1
-    Entonces la operación retorna código 200
+  Scenario: Delete an existing product
+    Given I query product with identifier 1
+    When I delete product 1
+    Then the operation returns status code 200
 
-  # ==================== VALIDACIÓN DE SCHEMA ====================
+  # ==================== SCHEMA VALIDATION ====================
 
-  Escenario: Validar estructura de respuesta de producto
-    Dado que consulto el producto con identificador 1
-    Entonces la respuesta contiene los campos: id, title, body, userId
+  Scenario: Validate product response structure
+    Given I query product with identifier 1
+    Then the response contains fields: id, title, body, userId
 
-  # ==================== BÚSQUEDA POR USUARIO ====================
+  # ==================== USER FILTER ====================
 
-  Escenario: Filtrar productos por usuario
-    Dado que filtro productos por usuario 1
-    Entonces todos los productos pertenecen al usuario 1
+  Scenario: Filter products by user
+    Given I filter products by user 1
+    Then all products belong to user 1
 
-  # ==================== COMENTARIOS ====================
+  # ==================== COMMENTS ====================
 
-  Escenario: Consultar comentarios de un producto
-    Dado que consulto los comentarios del producto 1
-    Entonces la respuesta contiene al menos 1 comentario
-    Y cada comentario tiene postId, id, name, email y body
+  Scenario: Get comments for a product
+    Given I query comments for product 1
+    Then the response contains at least 1 comment
+    And each comment has postId, id, name, email and body

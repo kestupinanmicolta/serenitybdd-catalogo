@@ -1,22 +1,21 @@
-# language: es
-Característica: API de usuarios
+Feature: Users API
 
-  Antecedentes:
-    Dado que la API base está configurada en "https://jsonplaceholder.typicode.com"
+  Background:
+    Given the API base is configured as "https://jsonplaceholder.typicode.com"
 
-  Escenario: Consultar todos los usuarios
-    Dado que consulto todos los usuarios
-    Entonces la respuesta contiene al menos 1 usuario
-    Y cada usuario tiene id, name y email
+  Scenario: Get all users
+    Given I query all users
+    Then the response contains at least 1 user
+    And each user has id, name and email
 
-  Escenario: Consultar usuario específico
-    Dado que consulto el usuario con identificador 1
-    Entonces el usuario tiene nombre y email válidos
+  Scenario: Get specific user
+    Given I query user with identifier 1
+    Then the user has valid name and email
 
-  Escenario: Crear usuario válido
-    Cuando creo un usuario con nombre "Karen Test", email "karen@test.com" y username "karentest"
-    Entonces el usuario es creado exitosamente
+  Scenario: Create valid user
+    When I create a user with name "Karen Test", email "karen@test.com" and username "karentest"
+    Then the user is created successfully
 
-  Escenario: Consultar usuario inexistente
-    Dado que consulto el usuario con identificador 99999
-    Entonces la consulta返回 código 404
+  Scenario: Query non-existent user
+    Given I query user with identifier 99999
+    Then the response status code is 404

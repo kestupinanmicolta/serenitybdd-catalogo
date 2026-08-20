@@ -1,47 +1,42 @@
-# language: es
-Característica: Validación de límites y edge cases
+Feature: Boundary values and edge cases
 
-  Antecedentes:
-    Dado que la API base está configurada en "https://jsonplaceholder.typicode.com"
+  Background:
+    Given the API base is configured as "https://jsonplaceholder.typicode.com"
 
   # ==================== BOUNDARY VALUES ====================
 
-  Escenario: Consultar producto con ID 0
-    Dado que consulto el producto con identificador 0
-    Entonces la consulta返回 código 404
+  Scenario: Query product with ID 0
+    Given I query product with identifier 0
+    Then the response status code is 404
 
-  Escenario: Consultar producto con ID negativo
-    Dado que consulto el producto con identificador -1
-    Entonces la consulta返回 código 404
+  Scenario: Query product with negative ID
+    Given I query product with identifier -1
+    Then the response status code is 404
 
-  Escenario: Consultar producto con ID decimal
-    Dado que consulto el producto con identificador 1.5
-    Entonces la consulta返回 código 404
+  Scenario: Query product with very large ID
+    Given I query product with identifier 999999999
+    Then the response status code is 404
 
-  Escenario: Consultar producto con ID muy grande
-    Dado que consulto el producto con identificador 999999999
-    Entonces la consulta返回 código 404
+  # ==================== TYPE VALIDATION ====================
 
-  # ==================== VALIDACIÓN DE TIPOS ====================
+  Scenario: Create product with numeric title
+    When I register a product with title "12345", description "Numeric test" and user 1
+    Then the product is registered successfully
 
-  Escenario: Crear producto con título numérico
-    Cuando registro un producto con título "12345", descripción "Test numérico" y usuario 1
-    Entonces el producto es registrado exitosamente
+  Scenario: Create product with long title
+    When I register a product with title "Very long product title for testing validation limits and string handling", description "Long title test" and user 1
+    Then the product is registered successfully
 
-  Escenario: Crear producto con título largo
-    Cuando registro un producto con título "Este es un título extremadamente largo para probar los límites de validación del sistema y cómo maneja strings de gran longitud sin fallar"
-    Entonces el producto es registrado exitosamente
+  Scenario: Create product with special characters
+    When I register a product with title "Product @#$%^&*()", description "Description with special chars" and user 1
+    Then the product is registered successfully
 
-  Escenario: Crear producto con caracteres especiales
-    Cuando registro un producto con título "Producto @#$%^&*()", descripción "Descripción con ñ y tildes áéíóú" y usuario 1
-    Entonces el producto es registrado exitosamente
+  # ==================== RESPONSE VALIDATION ====================
 
-  # ==================== VALIDACIÓN DE RESPUESTA ====================
+  Scenario: Verify response time
+    Given I query product with identifier 1
+    Then the response is received in less than 2 seconds
 
-  Escenario: Verificar tiempo de respuesta
-    Dado que consulto el producto con identificador 1
-    Entonces la respuesta se recibe en menos de 2 segundos
-
-  Escenario: Verificar Content-Type
-    Dado que consulto el producto con identificador 1
-    Entonces el Content-Type es "application/json; charset=utf-8"
+  Scenario: Verify Content-Type
+    Given I query product with identifier 1
+    Then the Content-Type is "application/json; charset=utf-8"
